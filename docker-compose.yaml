@@ -1,0 +1,91 @@
+version: "3.9"
+services:
+  ms-rotten-potatoes:
+    build: 
+      context: ./ms-rotten-potatoes/.
+      dockerfile: Dockerfile
+    depends_on:
+      - review
+      - movie
+    container_name: ms-rotten-potatoes-app
+    image: felipeschirmann/ms-rotten-potatoes:v1.0.1
+    environment:
+      MOVIE_SERVICE_URI: http://movie:8181
+      REVIEW_SERVICE_URI: http://review:80
+    ports:
+      - "8080:5000"
+    networks:
+      - rotten-potatoes-network
+      - rotten-review-network
+      - rotten-movie-network
+
+  review:
+    build:
+      context: ./ms-review/.
+      dockerfile: Dockerfile
+    depends_on:
+      - postgresdb
+      - movie
+    image: felipeschirmann/review:v1.0.1
+    container_name: review
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development" # Production or Development
+      ConnectionStrings__MyConnection: "Host=postgresdb;Database=postgres;Username=postgres;Password=Pg@123;"
+    ports:
+      - "8282:80"
+    networks:
+      - rotten-potatoes-network
+      - rotten-review-network
+
+  postgresdb:
+    container_name: postgresdb
+    image: postgres:14.1
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Pg@123
+      POSTGRES_DB: postgres
+    volumes:
+      - pql_db_data:/var/lib/postgresql/data
+    networks:
+      - rotten-review-network
+
+  movie:
+    build:
+      context: ./ms-movie/.
+      dockerfile: Dockerfile
+    depends_on:
+      - mongodb
+    container_name: movie
+    image: felipeschirmann/movie:v1.0.1
+    environment:
+      MONGODB_URI: mongodb://mongouser:mongopwd@mongodb:27017/admin
+    ports:
+      - "8181:8181"
+    networks:
+      - rotten-movie-network
+      - rotten-potatoes-network
+
+  mongodb:
+    image: mongo:4.0.8
+    container_name: mongodb
+    volumes:
+      - mongo_db_data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongouser
+      MONGO_INITDB_ROOT_PASSWORD: mongopwd
+    networks:
+      - rotten-movie-network
+
+volumes:
+  mongo_db_data:
+    driver: local
+  pql_db_data:
+    driver: local
+
+networks:
+  rotten-movie-network:
+    driver: bridge
+  rotten-review-network:
+    driver: bridge
+  rotten-potatoes-network:
+    driver: bridge
