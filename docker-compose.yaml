@@ -2,7 +2,7 @@ version: "3.9"
 services:
   ms-rotten-potatoes:
     build: 
-      context: ./ms-rotten-potatoes/.
+      context: ./
       dockerfile: Dockerfile
     depends_on:
       - review
@@ -21,12 +21,12 @@ services:
 
   review:
     build:
-      context: ./ms-review/.
+      context: ../ms-review/.
       dockerfile: Dockerfile
     depends_on:
       - postgresdb
       - movie
-    image: felipeschirmann/review:v1.0.1
+    image: felipeschirmann/ms-review:v1.0.1
     container_name: review
     environment:
       ASPNETCORE_ENVIRONMENT: "Development" # Production or Development
@@ -51,12 +51,12 @@ services:
 
   movie:
     build:
-      context: ./ms-movie/.
+      context: ../ms-movie/.
       dockerfile: Dockerfile
     depends_on:
       - mongodb
     container_name: movie
-    image: felipeschirmann/movie:v1.0.1
+    image: felipeschirmann/ms-movie:v1.0.1
     environment:
       MONGODB_URI: mongodb://mongouser:mongopwd@mongodb:27017/admin
     ports:
