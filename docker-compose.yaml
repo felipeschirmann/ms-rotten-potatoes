@@ -1,9 +1,9 @@
 version: "3.9"
 services:
   ms-rotten-potatoes:
-    build: 
-      context: ./
-      dockerfile: Dockerfile
+    # build: 
+    #   context: ./
+    #   dockerfile: Dockerfile
     depends_on:
       - review
       - movie
@@ -20,9 +20,9 @@ services:
       - rotten-movie-network
 
   review:
-    build:
-      context: ../ms-review/.
-      dockerfile: Dockerfile
+    # build:
+    #   context: ../ms-review/.
+    #   dockerfile: Dockerfile
     depends_on:
       - postgresdb
       - movie
@@ -50,9 +50,9 @@ services:
       - rotten-review-network
 
   movie:
-    build:
-      context: ../ms-movie/.
-      dockerfile: Dockerfile
+    # build:
+    #   context: ../ms-movie/.
+    #   dockerfile: Dockerfile
     depends_on:
       - mongodb
     container_name: movie
